@@ -1,0 +1,114 @@
+1. Install and Start Minikube
+1.1 Download Minikube (Windows PowerShell Admin)
+Invoke-WebRequest -Uri https://storage.googleapis.com/minikube/releases/latest/minikube-installer.exe -OutFile minikube.exe
+
+1.2 Run installer
+.\minikube.exe
+
+1.3 Start the Kubernetes cluster
+minikube start
+
+1.4 Check Minikube status
+minikube status
+
+2. Install kubectl (if not installed)
+2.1 Install using Chocolatey
+choco install kubernetes-cli
+
+2.2 Verify installation
+kubectl version --client
+
+3. Create Kubernetes Project Folder
+3.1 Create a working directory
+mkdir kubernetes-minikube
+cd kubernetes-minikube
+
+4. Create Deployment for Application
+4.1 Create file: deployment.yaml
+
+(Add this content)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+4.2 Apply deployment
+kubectl apply -f deployment.yaml
+
+4.3 Verify deployment & pods
+kubectl get deployments
+kubectl get pods
+
+
+📸 Screenshot Required: Pods visible in running state
+
+5. Create Service to Expose App
+5.1 Create service.yaml
+
+(Add this content)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30007
+
+5.2 Apply service
+kubectl apply -f service.yaml
+
+5.3 Verify service
+kubectl get svc
+
+
+📸 Screenshot Required: Service list displayed with NodePort
+
+6. Access the Application
+6.1 Open service in browser
+minikube service nginx-service
+
+
+📸 Screenshot Required: Browser showing Nginx welcome page
+
+7. Scale the Deployment
+7.1 Scale replicas
+kubectl scale deployment nginx-deployment --replicas=3
+
+7.2 Confirm scaling
+kubectl get pods
+
+
+📸 Screenshot Required: 3 pods running
+
+8. Debug / Check Details
+8.1 Describe pod
+kubectl describe pod <pod-name>
+
+8.2 View logs
+kubectl logs <pod-name>
+
+
+📸 Screenshot Required: Description & logs output
